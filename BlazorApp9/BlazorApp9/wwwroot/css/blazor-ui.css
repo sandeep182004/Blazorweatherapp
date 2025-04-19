@@ -1,0 +1,434 @@
+﻿@page "/login"
+<div class="page-wrapper login-page">
+    <div class="form-container login-box">
+        <h2 class="auth-heading"> <i class="fas fa-user"></i> Sign In</h2>
+        <div class="input-group">
+            <input type="text" class="auth-input" placeholder="Username" required>
+            <span class="input-icon"><i class="fas fa-user-circle"></i></span>
+        </div>
+        <div class="input-group">
+            <input type="email" class="auth-input" placeholder="Email Address" required>
+            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+        </div>
+        <div class="input-group">
+            <input type="password" class="auth-input" placeholder="Password" required>
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="auth-options">
+            <label class="remember-me">
+                <input type="checkbox"> Remember Me
+            </label>
+            <a href="/forgot-password" class="auth-link forgot-password">Forgot Password?</a>
+        </div>
+        <div class="button-container">
+            <button type="submit" class="auth-btn primary">Log In</button>
+        </div>
+        <div class="auth-footer">
+            <span>Don't have an account?</span>
+            <a href="/signup" class="auth-link">Sign up</a>
+        </div>
+        <div class="social-login">
+            <p class="social-text">Or sign in with</p>
+            <div class="social-buttons">
+                <button class="social-btn google"><i class="fab fa-google"></i> Google</button>
+                <button class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@page "/signup"
+<div class="page-wrapper signup-page">
+    <div class="form-container signup-box">
+        <h2 class="auth-heading"> <i class="fas fa-user-plus"></i> Create Account</h2>
+        <div class="input-group">
+            <input type="text" class="auth-input" placeholder="Username" required>
+            <span class="input-icon"><i class="fas fa-signature"></i></span>
+        </div>
+        <div class="input-group">
+            <input type="text" class="auth-input" placeholder="Full Name" required>
+            <span class="input-icon"><i class="fas fa-id-card"></i></span>
+        </div>
+        <div class="input-group">
+            <input type="email" class="auth-input" placeholder="Email Address" required>
+            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+        </div>
+        <div class="input-group">
+            <input type="tel" class="auth-input" placeholder="Phone Number" required>
+            <span class="input-icon"><i class="fas fa-phone"></i></span>
+        </div>
+        <div class="input-group">
+            <input type="password" class="auth-input" placeholder="Password" required>
+            <span class="input-icon"><i class="fas fa-lock"></i></span>
+            <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="input-group">
+            <input type="password" class="auth-input" placeholder="Confirm Password" required>
+            <span class="input-icon"><i class="fas fa-redo"></i></span>
+            <button type="button" class="toggle-password confirm-toggle"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="button-container">
+            <button type="submit" class="auth-btn primary">Create Account</button>
+        </div>
+        <div class="auth-footer">
+            <p>Already have an account? <a href="/login" class="auth-link">Log In</a> </p>
+        </div>
+    </div>
+</div>
+
+@page "/weather"
+<div class="page-wrapper weather-page">
+    <div class="form-container weather-box">
+        <h2 class="auth-heading"> <i class="fas fa-sun"></i> Weather Forecast</h2>
+        <div class="weather-search-container">
+            <div class="input-with-icon">
+                <input type="text" id="search" class="auth-input" placeholder="Search Location (City, ZIP)">
+                <span class="input-icon"><i class="fas fa-search"></i></span>
+            </div>
+            <div class="button-container">
+                <button class="auth-btn primary" onclick="searchWeather()"> <i class="fas fa-globe"></i> Search</button>
+            </div>
+        </div>
+        <div class="weather-input-container">
+            <label for="city"> <i class="fas fa-map-marker-alt"></i> Or Get Weather for:</label>
+            <div class="input-with-icon">
+                <input type="text" id="city" class="auth-input" placeholder="E.g., Amaravati">
+                <span class="input-icon"><i class="fas fa-city"></i></span>
+            </div>
+            <label for="zipcode"> <i class="fas fa-postal-code"></i> ZIP Code (Optional):</label>
+            <div class="input-with-icon">
+                <input type="text" id="zipcode" class="auth-input" placeholder="E.g., 500001">
+                <span class="input-icon"><i class="fas fa-hashtag"></i></span>
+            </div>
+            <div class="button-container">
+                <button class="auth-btn secondary" onclick="getWeather()"> <i class="fas fa-cloud-sun"></i> Get Weather</button>
+            </div>
+        </div>
+        <div class="weather-data" id="weatherData">
+            </div>
+    </div>
+</div>
+
+<style>
+    /* Include Font Awesome for icons */
+    /* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="..." crossorigin="anonymous" /> */
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+        background: linear-gradient(135deg, #e0f7fa, #c5e1a5); /* More vibrant gradient */
+        color: #37474f;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .page-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1.5rem;
+    }
+
+    .form-container {
+        background: rgba(255, 255, 255, 0.9); /* Slightly more transparency */
+        padding: 3rem;
+        border-radius: 18px; /* More rounded */
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+        width: 100%;
+        max-width: 450px; /* Slightly wider */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.2s ease-in-out; /* Subtle hover effect */
+    }
+
+    .form-container:hover {
+        transform: translateY(-5px);
+    }
+
+    .auth-form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .auth-heading {
+        font-size: 2.1rem;
+        margin-bottom: 1.8rem;
+        text-align: center;
+        color: #263238;
+        font-weight: 500;
+    }
+
+    .auth-heading i {
+        margin-right: 0.5rem;
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 1.2rem;
+    }
+
+    .auth-input {
+        width: 100%;
+        padding: 1rem;
+        padding-left: 38px; /* Adjust for icon */
+        border: 1.5px solid #b0bec5;
+        border-radius: 10px;
+        font-size: 1rem;
+        background-color: #eceff1;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .auth-input:focus {
+        border-color: #00897b; /* Teal focus color */
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(0, 137, 123, 0.25);
+        background-color: #fff;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #78909c;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        outline: none;
+        color: #78909c;
+    }
+
+    .auth-btn {
+        padding: 1rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-btn.primary {
+        background-color: #00897b; /* Teal primary color */
+        color: #fff;
+        border: none;
+    }
+
+    .auth-btn.secondary {
+        background-color: #4db6ac; /* Slightly lighter teal */
+        color: #fff;
+        border: none;
+    }
+
+    .auth-btn:hover {
+        transform: scale(1.01);
+        box-shadow: 0 4px 7px rgba(0, 0, 0, 0.15);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.95rem;
+        color: #546e7a;
+    }
+
+    .auth-link {
+        color: #00897b;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+
+    .auth-link:hover {
+        text-decoration: underline;
+        color: #005649;
+    }
+
+    /* Login Page Specific Styles */
+    .login-page {
+        background: linear-gradient(135deg, #bbdefb, #81d4fa); /* Slightly different login background */
+    }
+
+    .login-box {
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    .auth-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #546e7a;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+    }
+
+    .remember-me input[type="checkbox"] {
+        margin-right: 0.3rem;
+    }
+
+    .forgot-password {
+        font-size: 0.9rem;
+    }
+
+    .social-login {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .social-text {
+        color: #78909c;
+        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .social-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+
+    .social-btn {
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        border: 1px solid #cfd8dc;
+        background-color: #fff;
+        color: #455a64;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .social-btn i {
+        margin-right: 0.5rem;
+    }
+
+    .social-btn.google:hover {
+        background-color: #db4437;
+        color: #fff;
+    }
+
+    .social-btn.facebook:hover {
+        background-color: #3b5998;
+        color: #fff;
+    }
+
+    /* Sign Up Page Specific Styles */
+    .signup-page {
+        background: linear-gradient(135deg, #ffe0b2, #ffcc80); /* Different signup background */
+    }
+
+    .signup-box {
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    /* Weather Section Enhancements */
+    .weather-page {
+        background: linear-gradient(135deg, #80cbc4, #4db6ac); /* Weather page background */
+    }
+
+    .weather-box {
+        background: rgba(255, 255, 255, 0.92);
+    }
+
+    .weather-search-container {
+        display: flex;
+        gap: 0.8rem;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .weather-input-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+    .weather-input-container label {
+        font-size: 1.05rem;
+        color: #263238;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .input-with-icon {
+        position: relative;
+        flex-grow: 1; /* Allow input to take more space */
+    }
+
+    .input-with-icon .auth-input {
+        padding-left: 38px;
+    }
+
+    .weather-data {
+        background-color: #e0f2f1;
+        border: 1.5px solid #b2dfdb;
+        padding: 1.5rem;
+        border-radius: 12px;
+        width: 100%;
+        text-align: center;
+        color: #2e7d32;
+        font-size: 1.1rem;
+        box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .weather-data h3 {
+        margin-bottom: 0.8rem;
+        font-weight: 500;
+        color: #2e7d32;
+    }
+
+    .weather-data p {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Button Container Styling */
+    .button-container {
+        border-radius: 12px;
+        padding: 4px;
+        margin-top: 1rem; /* Adjust spacing */
+        width: 100%; /* Make the container full width */
+        display: flex;
+        justify-content: center; /* Center the button */
+    }
+
+    .button-container .auth-btn {
+        margin: 0; /* Reset any implicit button margins */
+        border-radius: 10px;
+        width: 100%; /* Make the button fill the container */
+    }
+</style>
+
+<script>
+    function searchWeather() {
+        const searchTerm = document.getElementById('search').value.trim();
+        const output = document.getElementById('weatherData');
+        if (!searchTerm) {
+            output.innerHTML = "<p style='color: #d32f2f;'> <i class='

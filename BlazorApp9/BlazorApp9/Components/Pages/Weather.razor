@@ -1,0 +1,108 @@
+﻿@page "/weather"
+@inject HttpClient Http
+@rendermode InteractiveServer
+
+<div class="weather-wrapper">
+    <h1 class="weather-title">Weather Information</h1>
+    <div class="weather-input-container">
+        <label for="cityInput">City:</label>
+        <input id="cityInput" class="weather-input" placeholder="Enter City" @bind="city" />
+        <button class="weather-button" @onclick="FetchWeatherData">Search</button>
+    </div>
+
+    @if (isLoading)
+    {
+        <p class="loading-indicator">Loading weather data...</p>
+    }
+    else if (weatherData != null)
+    {
+        <div class="weather-data">
+            <p><strong>Location:</strong> @weatherData.Name</p>
+            <p><strong>Temperature:</strong> @((weatherData.Main.Temp - 273.15).ToString("0.0")) °C</p>
+            <p><strong>Condition:</strong> @weatherData.Weather[0].Description</p>
+            <p><strong>Humidity:</strong> @weatherData.Main.Humidity%</p>
+            <button class="weather-button" @onclick="() => AddToFavorites(weatherData.Name, weatherData.Weather[0].Description)">Add to Favorites</button>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-message">@errorMessage</p>
+    }
+
+    <h2>Your Favorites</h2>
+    <ul>
+        @foreach (var favorite in favorites)
+        {
+            <li>
+                @favorite
+                <button @onclick="() => RemoveFromFavorites(favorite)">Remove</button>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private string city = string.Empty;
+    private bool isLoading = false;
+    private string? errorMessage = null;
+    private WeatherResponse? weatherData;
+    private List<string> favorites = new();
+
+    private async Task FetchWeatherData()
+    {
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            errorMessage = "Please enter a city name.";
+            return;
+        }
+
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            string apiKey = "86798ade60afae7645ef2aabfed1ef2a";
+            string url = $"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}";
+
+            weatherData = await Http.GetFromJsonAsync<WeatherResponse>(url);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void AddToFavorites(string locationName, string description)
+    {
+        if (!favorites.Contains(locationName))
+        {
+            favorites.Add(locationName);
+        }
+    }
+
+    private void RemoveFromFavorites(string locationName)
+    {
+        favorites.Remove(locationName);
+    }
+
+    public class WeatherResponse
+    {
+        public string Name { get; set; } = string.Empty;
+        public Main Main { get; set; } = new();
+        public WeatherCondition[] Weather { get; set; } = Array.Empty<WeatherCondition>();
+    }
+
+    public class Main
+    {
+        public double Temp { get; set; }
+        public int Humidity { get; set; }
+    }
+
+    public class WeatherCondition
+    {
+        public string Description { get; set; } = string.Empty;
+    }
+}

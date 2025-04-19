@@ -1,0 +1,51 @@
+﻿@page "/signup"
+@using BlazorApp1.DBConnections
+@using BlazorApp1.Models
+@using MongoDB.Driver
+@inject NavigationManager Navigation
+@inject Mongo MongoHelper
+@rendermode InteractiveServer
+
+<div class="signup-wrapper">
+    <form class="signupForm" @onsubmit="HandleSignup">
+        <h1 class="signup-heading">Sign Up</h1>
+        <input class="signup-name" placeholder="Username" @bind="user.Username" required />
+        <input class="signup-email" type="email" placeholder="Email" @bind="user.Email" required />
+        <input class="signup-password" type="password" placeholder="Password" @bind="user.Password" required />
+        <button type="submit" class="register-btn">Sign Up</button>
+        <div class="login-router-wrapper">
+            <span>Already have an account?</span>
+            <a class="login-link" href="/">Log In</a>
+        </div>
+    </form>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p class="error-message">@errorMessage</p>
+    }
+</div>
+
+@code {
+    private User user = new User();
+    private string? errorMessage;
+
+    private async Task HandleSignup()
+    {
+        try
+        {
+            var existingUser = await MongoHelper.Users.Find(u => u.Username == user.Username).FirstOrDefaultAsync();
+            if (existingUser != null)
+            {
+                errorMessage = "Username already exists.";
+                return;
+            }
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            await MongoHelper.Users.InsertOneAsync(user);
+            Navigation.NavigateTo("/weather");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred: {ex.Message}";
+        }
+    }
+}

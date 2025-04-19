@@ -1,0 +1,42 @@
+﻿@page "/"
+@using BlazorApp1.DBConnections
+@using BlazorApp1.Models
+@using MongoDB.Driver
+@inject NavigationManager Navigation
+@inject Mongo Mongo
+@rendermode InteractiveServer
+
+<div class="login-wrapper">
+    <form class="loginForm" @onsubmit="HandleLogin">
+        <h1 class="login-heading">Log In</h1>
+        <input class="login-email" placeholder="Username" @bind="loginUser.Username" required />
+        <input class="login-password" type="password" placeholder="Password" @bind="loginUser.Password" required />
+        <button type="submit" class="login-btn">Log In</button>
+        <div class="register-router-wrapper">
+            <span>Don't have an account?</span>
+            <a class="register-link" href="/signup">Sign Up</a>
+        </div>
+    </form>
+    @if (!string.IsNullOrEmpty(loginErrorMessage))
+    {
+        <p class="error-message">@loginErrorMessage</p>
+    }
+</div>
+
+@code {
+    private User loginUser = new User();
+    private string? loginErrorMessage;
+
+    private async Task HandleLogin()
+    {
+        var user = await Mongo.Users.Find(u => u.Username == loginUser.Username).FirstOrDefaultAsync();
+        if (user != null && BCrypt.Net.BCrypt.Verify(loginUser.Password, user.Password))
+        {
+            Navigation.NavigateTo("/weather");
+        }
+        else
+        {
+            loginErrorMessage = "Invalid username or password.";
+        }
+    }
+}
